@@ -85,11 +85,16 @@ namespace WatchDog
                 CallingMethod = callerName,
                 LineNumber = lineNumber,
                 LogLevel = level
-            }; 
+            };
 
             //Insert
             await DynamicDBManager.InsertLog(log);
-            await ServiceProviderFactory.BroadcastHelper.BroadcastLog(log);
+
+            var broadcastHelper = ServiceProviderFactory.BroadcastHelper;
+            if (broadcastHelper != default)
+            {
+                await broadcastHelper.BroadcastLog(log);
+            }
         }
         public static void LogError(string message, [Optional] string eventId, [CallerMemberName] string callerName = "", [CallerFilePath] string filePath = "", [CallerLineNumber] int lineNumber = 0)
         {
